@@ -6,7 +6,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.WindowManager.LayoutParams;
 
-import com.itboys.myapplication.R;
+import com.itboys.safeswipe.R;
 
 public class LockscreenUtils {
 
