@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.itboys.safeswipe.LockScreenActivity" >
+    tools:context="com.itboys.lockscreen.SafeSwipe" >
 
     <TextView
         android:id="@+id/tvInstructions"
@@ -26,6 +26,7 @@
         android:layout_below="@id/tvInstructions"
         android:layout_centerHorizontal="true"
         android:text="@string/unlock"
-        android:textAppearance="@android:style/TextAppearance.Large" />
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:onClick="unlockScreen"/>
 
 </RelativeLayout>
