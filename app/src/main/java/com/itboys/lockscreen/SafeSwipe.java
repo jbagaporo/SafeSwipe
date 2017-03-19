@@ -1,15 +1,22 @@
 package com.itboys.lockscreen;
 
 import android.app.Activity;
+import android.app.WallpaperManager;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 import com.itboys.safeswipe.R;
 
-public class SafeSwipe extends Activity {
+
+public class SafeSwipe extends AppCompatActivity {
+
+    private static final String SHARED_PREFERENCES_FILE = "SharePrefSettingsParam";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,9 +24,17 @@ public class SafeSwipe extends Activity {
 
         //Set up our Lockscreen
         makeFullScreen();
-        startService(new Intent(this,LockScreenService.class));
+        startService(new Intent(this, YourService.class));
 
         setContentView(R.layout.activity_lockscreen);
+
+        //get the wallpaper from homescreen
+        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+        final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+
+        //set the wallpaper u got from homescreen on ur layout
+        RelativeLayout ll = (RelativeLayout) findViewById(R.id.myRelativeLayout);
+        ll.setBackground(wallpaperDrawable);
     }
 
     /**
@@ -31,7 +46,7 @@ public class SafeSwipe extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         if(Build.VERSION.SDK_INT < 19) { //View.SYSTEM_UI_FLAG_IMMERSIVE is only on API 19+
             this.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE);
         } else {
             this.getWindow().getDecorView()
                     .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
@@ -45,6 +60,9 @@ public class SafeSwipe extends Activity {
 
     public void unlockScreen(View view) {
         //Instead of using finish(), this totally destroys the process
-        android.os.Process.killProcess(android.os.Process.myPid());
+        finish();
+        //android.os.Process.killProcess(android.os.Process.myPid());
     }
+
+
 }

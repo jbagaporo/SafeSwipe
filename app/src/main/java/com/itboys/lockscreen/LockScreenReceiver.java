@@ -9,7 +9,7 @@ public class LockScreenReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        //If the screen was just turned on or it just booted up, start your Lock Activity
+        //If the screen was just turned off or it just booted up, start your Lock Activity
         if(action.equals(Intent.ACTION_SCREEN_OFF) || action.equals(Intent.ACTION_BOOT_COMPLETED))
         {
             Intent i = new Intent(context, SafeSwipe.class);

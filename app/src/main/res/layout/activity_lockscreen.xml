@@ -8,15 +8,19 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.itboys.lockscreen.SafeSwipe" >
+    tools:context="com.itboys.lockscreen.SafeSwipe"
+    android:gravity="center"
+    android:id="@+id/myRelativeLayout">
+
 
     <TextView
         android:id="@+id/tvInstructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/instructions"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:textColor="#000000" />
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textColor="#000000"
+        android:gravity="center"/>
 
     <Button
         android:id="@+id/btnUnlock"
@@ -26,7 +30,8 @@
         android:layout_below="@id/tvInstructions"
         android:layout_centerHorizontal="true"
         android:text="@string/unlock"
-        android:textAppearance="@android:style/TextAppearance.Large"
+        android:gravity="center"
+        android:textAppearance="@android:style/TextAppearance.Medium"
         android:onClick="unlockScreen"/>
 
 </RelativeLayout>

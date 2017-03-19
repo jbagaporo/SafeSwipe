@@ -1,0 +1,24 @@
+package com.itboys.lockscreen;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
+
+/**
+ * Created by tanthan on 3/19/2017.
+ */
+public class YourService extends Service {
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        startService(new Intent(this,LockScreenService.class));
+        return super.onStartCommand(intent, flags, startId);
+    }
+}

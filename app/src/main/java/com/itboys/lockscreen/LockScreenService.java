@@ -21,9 +21,10 @@ public class LockScreenService extends Service {
     @SuppressWarnings("deprecation")
     public void onCreate() {
         KeyguardManager.KeyguardLock key;
-        KeyguardManager km = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+        KeyguardManager
+                km = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
 
-        //This is deprecated, but it is a simple way to disable the lockscreen in code
+        //This is deprecated, but it is a simple way to disable the lock screen in code
         key = km.newKeyguardLock("IN");
 
         key.disableKeyguard();
