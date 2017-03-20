@@ -1,68 +1,149 @@
 package com.itboys.lockscreen;
 
-import android.app.Activity;
-import android.app.WallpaperManager;
+import android.app.Fragment;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.os.Bundle;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.Camera;
+import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.RelativeLayout;
+import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.widget.ImageView;
 
+import com.itboys.lockscreen.LocationFragment;
 import com.itboys.safeswipe.R;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-public class SafeSwipe extends AppCompatActivity {
+public class SafeSwipe extends AppCompatActivity implements SurfaceHolder.Callback {
 
-    private static final String SHARED_PREFERENCES_FILE = "SharePrefSettingsParam";
+    private static final String CAMERA_DIR = "/dcim/";
+
+    //a variable to store a reference to the Surface View at the main.admin file
+    private SurfaceView sv;
+
+    //a bitmap to display the captured image
+    private Bitmap bmp;
+
+    /**Camera variables**/
+
+    //a surface holder
+    private SurfaceHolder sHolder;
+
+    //a variable to control the camera
+    private Camera mCamera;
+    //the camera parameters
+    private Camera.Parameters parameters;
+    private LocationFragment mLocationFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_safe_swipe);
 
-        //Set up our Lockscreen
-        makeFullScreen();
-        startService(new Intent(this, YourService.class));
+        //get the Surface View at the main.admin file
+        sv = (SurfaceView) this.findViewById(R.id.surfaceView_safeSwipe);
 
-        setContentView(R.layout.activity_lockscreen);
+        //Get a surface
+        sHolder = sv.getHolder();
 
-        //get the wallpaper from homescreen
-        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-        final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+        //add the callback interface methods defined below as the Surface View callbacks
+        sHolder.addCallback(this);
 
-        //set the wallpaper u got from homescreen on ur layout
-        RelativeLayout ll = (RelativeLayout) findViewById(R.id.myRelativeLayout);
-        ll.setBackground(wallpaperDrawable);
+        //tells Android that this surface will have its data constantly replaced
+        sHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        mLocationFragment = new LocationFragment();
+        getSupportFragmentManager().beginTransaction().add(
+                R.id.fragment_safeSwipe, mLocationFragment).commit();
     }
 
-    /**
-     * A simple method that sets the screen to fullscreen.  It removes the Notifications bar,
-     *   the Actionbar and the virtual keys (if they are on the phone)
-     */
-    public void makeFullScreen() {
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        if(Build.VERSION.SDK_INT < 19) { //View.SYSTEM_UI_FLAG_IMMERSIVE is only on API 19+
-            this.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE);
-        } else {
-            this.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    @Override
+    public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3)
+    {
+
+
+        //get camera parameters
+        parameters = mCamera.getParameters();
+
+        //set camera parameters
+        mCamera.setParameters(parameters);
+        mCamera.startPreview();
+
+        //sets what code should be executed after the picture is taken
+        Camera.PictureCallback mCall = new Camera.PictureCallback()
+        {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera)
+            {
+                //decode the data obtained by the camera into a Bitmap
+                bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                //set the iv_image
+//                iv_image.setImageBitmap(bmp);
+                saveImage(bmp);
+
+            }
+
+        };
+
+        mCamera.takePicture(null, null, mCall);
+
+//        Intent intent = new Intent(this, MainActivity.class);
+//        startActivity(intent);
+
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder)
+    {
+        // The Surface has been created, acquire the camera and tell it where
+        // to draw the preview.
+        mCamera = Camera.open(1);
+        try {
+            mCamera.setPreviewDisplay(holder);
+
+        } catch (IOException exception) {
+            mCamera.release();
+            mCamera = null;
         }
     }
 
     @Override
-    public void onBackPressed() {
-        return; //Do nothing!
+    public void surfaceDestroyed(SurfaceHolder holder)
+    {
+        //stop the preview
+        mCamera.stopPreview();
+        //release the camera
+        mCamera.release();
+        //unbind the camera from this object
+        mCamera = null;
     }
 
-    public void unlockScreen(View view) {
-        //Instead of using finish(), this totally destroys the process
-        finish();
-        //android.os.Process.killProcess(android.os.Process.myPid());
+    public void saveImage(Bitmap finalbitmap)
+    {
+
+        String root = Environment.getExternalStorageDirectory().getAbsolutePath();
+        File myDir = new File (root + CAMERA_DIR + "SafeSwipe");
+        myDir.mkdirs();
+
+        String fname = "SafeSwipe Image.jpg";
+        File file = new File(myDir, fname);
+        if (file.exists()) file.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalbitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+            startActivityForResult(new Intent(this, MainActivity.class),1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-
 }
