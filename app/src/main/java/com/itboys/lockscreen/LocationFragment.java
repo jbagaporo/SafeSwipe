@@ -101,10 +101,13 @@ public class LocationFragment extends Fragment implements
 
             SmsManager sm = SmsManager.getDefault();
             msg += "Location Detected: " + lastLat + ", " + lastLong;
-            sm.sendTextMessage(tanthan, null, msg, null, null);
+            sm.sendTextMessage(tats, null, msg, null, null);
 
         } else {
 //            Toast.makeText(getActivity(), R.string.no_location_detected, Toast.LENGTH_LONG).show();
+            SmsManager sm = SmsManager.getDefault();
+            msg += "No Location Detected.";
+            sm.sendTextMessage(tats, null, msg, null, null);
         }
 
     }
